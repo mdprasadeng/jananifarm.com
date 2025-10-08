@@ -1,0 +1,20 @@
+* Settings
+ * [green, yellow, gray] [,,,] [,,,]
+ *  + stop showing guess after green
+ * stop showing guesses when guessed
+ * timer 
+Post Game 
+* todays eye count and time
+* Current Streak
+* Max Streak 
+* Your Top 5 Stats by eye count, time 
+
+Sudokle Mini
+
+First Time User Experience 
+ * On 9x9 play on 3x3
+ * First Guess Green
+ * Auto fill four adjacent
+ * Two Yellow and two Gray
+
+
