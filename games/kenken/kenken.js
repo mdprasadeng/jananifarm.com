@@ -1,31 +1,48 @@
 
 Array.prototype.random = function () {
-  return this[Math.floor((Math.random()*this.length))];
+    return this[Math.floor((Math.random() * this.length))];
 }
 
-Array.prototype.removeByValue = function(value) {
-  for (let i = 0; i < this.length; i++) {
-    if (this[i] === value) {
-      this.splice(i, 1);
-      i--; // Adjust index after removal to re-check the current position
+Array.prototype.removeByValue = function (value) {
+    for (let i = 0; i < this.length; i++) {
+        if (this[i] === value) {
+            this.splice(i, 1);
+            i--; // Adjust index after removal to re-check the current position
+        }
     }
-  }
-  return this; // Return the modified array for chaining
+    return this; // Return the modified array for chaining
 };
 
-let puzzle_text = `6x6
+let puzzle_6 = `6x6
 1:-4,2:-4,3:-1,4:+12,5:/3,6:*60,7:+8,8:+1,9:/2,A:+9,B:+7,C:+10,D:*300,E:+8,F:/3
 112233
 455678
 446677
 9ABCCD
 9ABBDD
-EEEFFD`
+EEEFFD`;
 
-function generate_answer(text) {
+let puzzle_3 = `3x3
+1:+9,2:+3,3:+6
+111
+122
+333
+`
+let puzzle_text = puzzle_6
+
+class Puzzle {
+    constructor(size, rule_labels, rules, rule_indexes) {
+        this.size = size;
+        this.rule_labels = rule_labels;
+        this.rules = rules;
+        this.rule_indexes = rule_indexes;
+    }
+}
+
+function parse_puzzle_text(text) {
     let lines = text.split("\n")
     let size = parseInt(lines[0].split("x"))
-    
+
     let rules_txt = lines[1].split(",")
     let rules = {}
     let rule_indexes = {}
@@ -35,73 +52,91 @@ function generate_answer(text) {
         rule_indexes[rule_text_split[0]] = []
     }
 
-    let rule_labels = new Array(size*size);
-    for(let i=2; i < 2 + size; i ++) {
+    let rule_labels = new Array(size * size);
+    for (let i = 2; i < 2 + size; i++) {
         let rule_grid = lines[i].split("")
-        for(let r=0; r<size; r++) {
-            rule_indexes[rule_grid[r]].push((i-2)*size + r);
-            rule_labels[(i-2)*size + r] = rule_grid[r]
+        for (let r = 0; r < size; r++) {
+            rule_indexes[rule_grid[r]].push((i - 2) * size + r);
+            rule_labels[(i - 2) * size + r] = rule_grid[r]
         }
     }
+    return new Puzzle(size, rule_labels, rules, rule_indexes);
+}
 
+function generate_puzzle_text(size) {
+    let text = "";
+    let total_sum = (size * size * (size + 1)) / 2
+    text += `${size}*${size}
+1:+${total_sum}
+`
+    for (let i = 0; i < size; i++) {
+        text +=  "1".repeat(size) + "\n";      
+    }
 
-    let valids = new Array(size*size);
-    let answer = new Array(size*size);
-    for(let i=0; i<size*size; i++) {
+    return text;
+}
+
+function generate_answers(puzzle, max_answers = 10) {
+    let size = puzzle.size;
+
+    let answers = []
+
+    let valids = new Array(size * size);
+    let answer = new Array(size * size);
+    for (let i = 0; i < size * size; i++) {
         valids[i] = []
-        for(let j=0; j<size; j++) {
-            valids[i].push(j+1);
+        for (let j = 0; j < size; j++) {
+            valids[i].push(j + 1);
         }
         answer[i] = 0;
     }
 
     let guessAt = 0;
-    let solution_impossible = false
+    let no_valids_at_start = false
     let loop_breaker = 0;
-    while(guessAt < size*size ) {
-        
+    while (guessAt < size * size) {
+
         //loop breaker
         loop_breaker++;
         if (loop_breaker > 99999) {
             break;
-        } 
+        }
 
-        //fail state
-        if (solution_impossible) {
-            console.log("no solution", valids);
-            return undefined;
+        //no more options to check
+        if (no_valids_at_start) {
+            return answers;
         }
 
         //backtracking
         if (valids[guessAt].length == 0) {
             guessAt--;
             if (guessAt < 0) {
-                solution_impossible = true;
+                no_valids_at_start = true;
                 continue
             }
             valids[guessAt].removeByValue(answer[guessAt]);
-            valids[guessAt+1] = []
-            for(let j=0; j<size; j++) {
-                valids[guessAt+1].push(j+1)
+            valids[guessAt + 1] = []
+            for (let j = 0; j < size; j++) {
+                valids[guessAt + 1].push(j + 1)
             }
-            
-            answer[guessAt] = 0;            
+
+            answer[guessAt] = 0;
             continue;
         }
 
         //guess
         answer[guessAt] = valids[guessAt].random();
-        
+
         //check all in same row and col
         let col = guessAt % size;
-        let row = (guessAt - col) ;
+        let row = (guessAt - col);
         let validGuess = true
-        for (let i=0; i<size ; i++) {
-            let coli = col + i*size;
+        for (let i = 0; i < size; i++) {
+            let coli = col + i * size;
             let rowi = row + i;
-            if ( 
+            if (
                 (coli != guessAt && answer[guessAt] == answer[coli]) //something else in column is same
-                || 
+                ||
                 (rowi != guessAt && answer[guessAt] == answer[rowi]) //something else in row is same    
             ) {
                 valids[guessAt].removeByValue(answer[guessAt]);
@@ -112,9 +147,9 @@ function generate_answer(text) {
 
         }
 
-        let rule_label = rule_labels[guessAt]
-        let rule = rules[rule_label];
-        let rule_locations = rule_indexes[rule_label];
+        let rule_label = puzzle.rule_labels[guessAt]
+        let rule = puzzle.rules[rule_label];
+        let rule_locations = puzzle.rule_indexes[rule_label];
         let computed_value = 0;
         let expected_value = parseInt(rule.substr(1));
         for (const rule_location of rule_locations) {
@@ -143,12 +178,12 @@ function generate_answer(text) {
                             if (computed_value > answer[rule_location]) {
                                 computed_value = computed_value / answer[rule_location];
                             } else {
-                                computed_value = answer[rule_location] / computed_value;    
+                                computed_value = answer[rule_location] / computed_value;
                             }
-                            
+
                         }
                         break;
-                }    
+                }
             } else {
                 computed_value = expected_value;
                 break;
@@ -157,18 +192,32 @@ function generate_answer(text) {
 
         if (computed_value != expected_value) {
             valids[guessAt].removeByValue(answer[guessAt]);
-                answer[guessAt] = 0;
-                validGuess = false;    
+            answer[guessAt] = 0;
+            validGuess = false;
         }
-        
+
 
         if (validGuess) {
             guessAt++;
+            if (guessAt == size * size) {
+                answers.push(answer.slice())
+                if (answers.length >= max_answers) {
+                    break;
+                }
+                guessAt--;
+                valids[guessAt].removeByValue(answer[guessAt]);
+                answer[guessAt] = 0; 
+            }
         }
 
     }
-    
-    return answer;
+
+    return answers;
 }
 
-console.log(generate_answer(puzzle_text))
+let labels = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+let shapes = [
+    "1", "R2", "D2", "R3", "D3", "L31", "L32", "L33", "L34", "L41", "L42", "L43", "L44", "Z4", "S4", "R4", "D4"
+];
+
+console.log(generate_answers(parse_puzzle_text(puzzle_text)));

@@ -1,0 +1,3 @@
+D:/github/jananifarm.com/games/breakout/build/CMakeFiles/hello.dir
+D:/github/jananifarm.com/games/breakout/build/CMakeFiles/edit_cache.dir
+D:/github/jananifarm.com/games/breakout/build/CMakeFiles/rebuild_cache.dir
