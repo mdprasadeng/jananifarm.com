@@ -25,6 +25,8 @@
  ********************************************************************************************/
 
 #include "raylib.h"
+#define RAYGUI_IMPLEMENTATION
+#include "./raygui.h"
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -46,6 +48,23 @@ typedef enum BoneName
     LEFT_UPPER_LEG,
     LEFT_LOWER_LEG,
 } BoneName;
+
+const char * const BoneNameStr[] =
+{
+    [SKULL] = "Skull",
+    [NECK] = "Neck",
+    [SHOULDER] = "Shoulder",
+    [SPINE] = "Spine",
+    [HIPS] = "Hips",
+    [RIGHT_UPPER_ARM] = "RUArm",
+    [RIGHT_LOWER_ARM] = "RLArm",
+    [RIGHT_UPPER_LEG] = "RULeg",
+    [RIGHT_LOWER_LEG] = "RLLeg",
+    [LEFT_UPPER_ARM] = "LUArm",
+    [LEFT_LOWER_ARM] = "LLArm",
+    [LEFT_UPPER_LEG] = "LULeg",
+    [LEFT_LOWER_LEG] = "LLLeg" 
+};
 
 typedef struct Bone
 {
@@ -81,7 +100,6 @@ typedef struct Skeleton
     int startingBoneIndex;
     float startingBoneAngle;
 } Skeleton;
-
 
 Skeleton generatePersonSkeleton()
 {
@@ -208,7 +226,7 @@ Skeleton generatePersonSkeleton()
         .boneAJoinAt = 0,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
-        .joinAngle = PI / 2 + PI * 0.06f,
+        .joinAngle = PI / 2 - PI * 0.06f,
     };
     index++;
     sk.joints[index] = (Joint){
@@ -217,7 +235,7 @@ Skeleton generatePersonSkeleton()
         .boneAJoinAt = 1,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
-        .joinAngle = -PI * 0.1f,
+        .joinAngle = PI * 0.1f,
     };
     index++;
 
@@ -250,17 +268,17 @@ void PlaceSkeleton(float x, float y, Skeleton sk)
     sk.bones[sk.startingBoneIndex].rotatedBy = sk.startingBoneAngle;
     int bonesStack[100];
     int placedBones = 0;
-    
-    //push to stack
+
+    // push to stack
     bonesStack[placedBones] = sk.startingBoneIndex;
     placedBones++;
-    
+
     while (placedBones != 0)
     {
-        //pop from stack
+        // pop from stack
         Bone fromBone = sk.bones[bonesStack[placedBones - 1]];
         placedBones--;
-        
+
         for (int i = 0; i < sk.jointsCount; i++)
         {
             if (sk.joints[i].boneA == fromBone.name)
@@ -273,7 +291,7 @@ void PlaceSkeleton(float x, float y, Skeleton sk)
                         toBoneIndex = b;
                     }
                 }
-                
+
                 float angle = sk.joints[i].joinAngle;
                 if (sk.joints[i].joinAngleType == RELATIVE)
                 {
@@ -288,8 +306,8 @@ void PlaceSkeleton(float x, float y, Skeleton sk)
                     .y = sk.joints[i].joinPoint.y - sk.joints[i].boneBJoinAt * sk.bones[toBoneIndex].length * sinf(angle),
                 };
                 sk.bones[toBoneIndex].rotatedBy = angle;
-                
-                //push to stack
+
+                // push to stack
                 bonesStack[placedBones] = toBoneIndex;
                 placedBones++;
             }
@@ -314,15 +332,21 @@ void DrawSkeleton(float x, float y, Skeleton skeleton)
             },
             bone.rotatedBy * RAD2DEG,
             RED);
-        
     }
     for (int i = 0; i < skeleton.jointsCount; i++)
     {
         DrawCircleLinesV(skeleton.joints[i].joinPoint, 10.0f, GRAY);
     }
-    
 }
 
+void DrawSkeletonDebugMenu(float x, float y, Skeleton skeleton)
+{
+    for (int i = 0; i < skeleton.bonesCount; i++)
+    {
+        GuiSliderBar((Rectangle) {.x = x, .y=y + i*25, 120,20}, BoneNameStr[skeleton.bones[i].name], TextFormat("%.0f", skeleton.bones[i].length), &skeleton.bones[i].length, 1 , 200);
+    }
+    
+}
 int main(void)
 {
     setbuf(stdout, NULL);
@@ -344,8 +368,7 @@ int main(void)
 
     int offX = (screenWidth - squareSize) / 2;
     int offY = (screenHeight - squareSize) / 2;
-
-    PlaceSkeleton(squareCenter.x, offY, skeleton);
+    
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
@@ -360,14 +383,19 @@ int main(void)
 
         ClearBackground(RAYWHITE);
 
+        
+
         for (int i = 0; i <= squareSize; i += squareUnit)
         {
             DrawLineEx((Vector2){offX, offY + i}, (Vector2){offX + squareSize, offY + i}, 1.0f + (i / squareUnit % 2 == 0 ? 1.5f : 0), LIGHTGRAY);
             DrawLineEx((Vector2){offX + i, offY}, (Vector2){offX + i, offY + squareSize}, 1.0f + (i / squareUnit % 2 == 0 ? 1.5f : 0), LIGHTGRAY);
         }
-
+        
+        PlaceSkeleton(squareCenter.x, offY, skeleton);
         DrawSkeleton(squareCenter.x, offY, skeleton);
-
+        DrawSkeletonDebugMenu(squareCenter.x + squareUnit * 12, offY, skeleton);
+        
+        
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
