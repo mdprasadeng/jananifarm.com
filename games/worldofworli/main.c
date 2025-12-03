@@ -157,16 +157,16 @@ Skeleton generatePersonSkeleton()
     sk.joints[index] = (Joint){
         .boneA = SKULL,
         .boneB = NECK,
-        .boneAJoinAt = 1,
+        .boneAJoinAt = 0.9f,
         .boneBJoinAt = 0,
-        .joinAngleType = RELATIVE,
-        .joinAngle = 0.1f};
+        .joinAngleType = ABSOLUTE,
+        .joinAngle = PI * 0.5f};
     index++;
 
     sk.joints[index] = (Joint){
         .boneA = NECK,
         .boneB = SHOULDER,
-        .boneAJoinAt = 1,
+        .boneAJoinAt = 0.9f,
         .boneBJoinAt = 0.5f,
         .joinAngleType = ABSOLUTE,
         .joinAngle = 0,
@@ -178,7 +178,7 @@ Skeleton generatePersonSkeleton()
         .boneB = UPPER_SPINE,
         .boneAJoinAt = 0.5f,
         .boneBJoinAt = 0,
-        .joinAngleType = RELATIVE,
+        .joinAngleType = ABSOLUTE,
         .joinAngle = PI / 2,
     };
     index++;
@@ -188,8 +188,8 @@ Skeleton generatePersonSkeleton()
         .boneB = LOWER_SPINE,
         .boneAJoinAt = 1,
         .boneBJoinAt = 0,
-        .joinAngleType = RELATIVE,
-        .joinAngle = 0,
+        .joinAngleType = ABSOLUTE,
+        .joinAngle = PI / 2,
     };
     index++;
 
@@ -208,7 +208,7 @@ Skeleton generatePersonSkeleton()
         .boneAJoinAt = 0.95f,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
-        .joinAngle = PI * 0.5,
+        .joinAngle = PI * 0.7 ,
     };
     index++;
 
@@ -236,8 +236,8 @@ Skeleton generatePersonSkeleton()
         .boneB = HIPS,
         .boneAJoinAt = 1,
         .boneBJoinAt = 0.5f,
-        .joinAngleType = RELATIVE,
-        .joinAngle = -PI / 2,
+        .joinAngleType = ABSOLUTE,
+        .joinAngle = 0,
     };
     index++;
 
@@ -356,7 +356,7 @@ void DrawSkeleton(float x, float y, Skeleton skeleton, float scaleBy)
     }
     for (int i = 0; i < skeleton.jointsCount; i++)
     {
-        // DrawCircleLines(x + skeleton.joints[i].joinPoint.x * scaleBy, y + skeleton.joints[i].joinPoint.y * scaleBy, 10.0f, GRAY);
+        //DrawCircle(x + skeleton.joints[i].joinPoint.x * scaleBy, y + skeleton.joints[i].joinPoint.y * scaleBy, 20.0f * scaleBy, RED);
     }
 }
 
@@ -538,6 +538,14 @@ int main(void)
         {
             DrawLineEx((Vector2){offX, offY + i}, (Vector2){offX + squareSize, offY + i}, 1.0f + (i / squareUnit % 2 == 0 ? 1.5f : 0), LIGHTGRAY);
             DrawLineEx((Vector2){offX + i, offY}, (Vector2){offX + i, offY + squareSize}, 1.0f + (i / squareUnit % 2 == 0 ? 1.5f : 0), LIGHTGRAY);
+        }
+
+        for (int i = 0; i < skeleton.jointsCount; i++)
+        {
+            if (skeleton.joints[i].joinAngleType == RELATIVE)
+            {
+                //skeleton.joints[i].joinAngle += PI * 0.001;
+            }
         }
 
         PlaceSkeleton(skeleton);
