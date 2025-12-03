@@ -9,6 +9,8 @@
 		"**/*.exe": true,
 	},
 	"files.associations": {
-		"*.m": "c"
+		"*.m": "c",
+		"algorithm": "c",
+		"format": "c"
 	}
 }

@@ -37,7 +37,8 @@ typedef enum BoneName
     SKULL,
     NECK,
     SHOULDER,
-    SPINE,
+    UPPER_SPINE,
+    LOWER_SPINE,
     HIPS,
     RIGHT_UPPER_ARM,
     RIGHT_LOWER_ARM,
@@ -49,22 +50,22 @@ typedef enum BoneName
     LEFT_LOWER_LEG,
 } BoneName;
 
-const char * const BoneNameStr[] =
-{
-    [SKULL] = "Skull",
-    [NECK] = "Neck",
-    [SHOULDER] = "Shoulder",
-    [SPINE] = "Spine",
-    [HIPS] = "Hips",
-    [RIGHT_UPPER_ARM] = "RUArm",
-    [RIGHT_LOWER_ARM] = "RLArm",
-    [RIGHT_UPPER_LEG] = "RULeg",
-    [RIGHT_LOWER_LEG] = "RLLeg",
-    [LEFT_UPPER_ARM] = "LUArm",
-    [LEFT_LOWER_ARM] = "LLArm",
-    [LEFT_UPPER_LEG] = "LULeg",
-    [LEFT_LOWER_LEG] = "LLLeg" 
-};
+const char *const BoneNameStr[] =
+    {
+        [SKULL] = "Skull",
+        [NECK] = "Neck",
+        [SHOULDER] = "Shoulder",
+        [UPPER_SPINE] = "Upper Spine",
+        [LOWER_SPINE] = "Lower Spine",
+        [HIPS] = "Hips",
+        [RIGHT_UPPER_ARM] = "RUArm",
+        [RIGHT_LOWER_ARM] = "RLArm",
+        [RIGHT_UPPER_LEG] = "RULeg",
+        [RIGHT_LOWER_LEG] = "RLLeg",
+        [LEFT_UPPER_ARM] = "LUArm",
+        [LEFT_LOWER_ARM] = "LLArm",
+        [LEFT_UPPER_LEG] = "LULeg",
+        [LEFT_LOWER_LEG] = "LLLeg"};
 
 typedef struct Bone
 {
@@ -108,7 +109,7 @@ Skeleton generatePersonSkeleton()
     sk.startingBoneIndex = 0;
     sk.startingBoneAngle = PI / 2;
 
-    sk.bonesCount = 13;
+    sk.bonesCount = 14;
     sk.bones = RL_MALLOC(sk.bonesCount * sizeof(Bone));
 
     int index = 0;
@@ -126,9 +127,11 @@ Skeleton generatePersonSkeleton()
     index++;
     sk.bones[index] = (Bone){.name = RIGHT_LOWER_ARM, .length = 80.0f};
     index++;
-    sk.bones[index] = (Bone){.name = SPINE, .length = 130.0f};
+    sk.bones[index] = (Bone){.name = UPPER_SPINE, .length = 70.0f};
     index++;
-    sk.bones[index] = (Bone){.name = HIPS, .length = 45.0f};
+    sk.bones[index] = (Bone){.name = LOWER_SPINE, .length = 70.0f};
+    index++;
+    sk.bones[index] = (Bone){.name = HIPS, .length = 75.0f};
     index++;
     sk.bones[index] = (Bone){.name = LEFT_UPPER_LEG, .length = 70.0f};
     index++;
@@ -139,7 +142,15 @@ Skeleton generatePersonSkeleton()
     sk.bones[index] = (Bone){.name = RIGHT_LOWER_LEG, .length = 100.0f};
     index++;
 
-    sk.jointsCount = 12;
+    float normalizeTo = 1000.0f;
+    float total = 400.0f;
+    float normalizeFactor = normalizeTo / total;
+    for (int i = 0; i < sk.bonesCount; i++)
+    {
+        sk.bones[i].length *= normalizeFactor;
+    }
+
+    sk.jointsCount = 13;
     sk.joints = RL_MALLOC(sk.jointsCount * sizeof(Joint));
 
     index = 0;
@@ -164,7 +175,7 @@ Skeleton generatePersonSkeleton()
 
     sk.joints[index] = (Joint){
         .boneA = SHOULDER,
-        .boneB = SPINE,
+        .boneB = UPPER_SPINE,
         .boneAJoinAt = 0.5f,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
@@ -173,9 +184,19 @@ Skeleton generatePersonSkeleton()
     index++;
 
     sk.joints[index] = (Joint){
+        .boneA = UPPER_SPINE,
+        .boneB = LOWER_SPINE,
+        .boneAJoinAt = 1,
+        .boneBJoinAt = 0,
+        .joinAngleType = RELATIVE,
+        .joinAngle = 0,
+    };
+    index++;
+
+    sk.joints[index] = (Joint){
         .boneA = SHOULDER,
         .boneB = LEFT_UPPER_ARM,
-        .boneAJoinAt = 0,
+        .boneAJoinAt = 0.1f,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
         .joinAngle = PI / 2 + PI * 0.1,
@@ -184,7 +205,7 @@ Skeleton generatePersonSkeleton()
     sk.joints[index] = (Joint){
         .boneA = LEFT_UPPER_ARM,
         .boneB = LEFT_LOWER_ARM,
-        .boneAJoinAt = 1,
+        .boneAJoinAt = 0.95f,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
         .joinAngle = PI * 0.5,
@@ -194,7 +215,7 @@ Skeleton generatePersonSkeleton()
     sk.joints[index] = (Joint){
         .boneA = SHOULDER,
         .boneB = RIGHT_UPPER_ARM,
-        .boneAJoinAt = 1,
+        .boneAJoinAt = 0.9f,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
         .joinAngle = PI / 2 - PI * 0.1,
@@ -203,7 +224,7 @@ Skeleton generatePersonSkeleton()
     sk.joints[index] = (Joint){
         .boneA = RIGHT_UPPER_ARM,
         .boneB = RIGHT_LOWER_ARM,
-        .boneAJoinAt = 1,
+        .boneAJoinAt = 0.95f,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
         .joinAngle = -PI * 0.5,
@@ -211,7 +232,7 @@ Skeleton generatePersonSkeleton()
     index++;
 
     sk.joints[index] = (Joint){
-        .boneA = SPINE,
+        .boneA = LOWER_SPINE,
         .boneB = HIPS,
         .boneAJoinAt = 1,
         .boneBJoinAt = 0.5f,
@@ -223,7 +244,7 @@ Skeleton generatePersonSkeleton()
     sk.joints[index] = (Joint){
         .boneA = HIPS,
         .boneB = LEFT_UPPER_LEG,
-        .boneAJoinAt = 0,
+        .boneAJoinAt = 0.2f,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
         .joinAngle = PI / 2 - PI * 0.06f,
@@ -232,7 +253,7 @@ Skeleton generatePersonSkeleton()
     sk.joints[index] = (Joint){
         .boneA = LEFT_UPPER_LEG,
         .boneB = LEFT_LOWER_LEG,
-        .boneAJoinAt = 1,
+        .boneAJoinAt = 0.95f,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
         .joinAngle = PI * 0.1f,
@@ -242,7 +263,7 @@ Skeleton generatePersonSkeleton()
     sk.joints[index] = (Joint){
         .boneA = HIPS,
         .boneB = RIGHT_UPPER_LEG,
-        .boneAJoinAt = 1,
+        .boneAJoinAt = 0.8f,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
         .joinAngle = PI / 2 - PI * 0.06f,
@@ -251,7 +272,7 @@ Skeleton generatePersonSkeleton()
     sk.joints[index] = (Joint){
         .boneA = RIGHT_UPPER_LEG,
         .boneB = RIGHT_LOWER_LEG,
-        .boneAJoinAt = 1,
+        .boneAJoinAt = 0.95f,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
         .joinAngle = PI * 0.1f,
@@ -261,10 +282,10 @@ Skeleton generatePersonSkeleton()
     return sk;
 }
 
-void PlaceSkeleton(float x, float y, Skeleton sk)
+void PlaceSkeleton(Skeleton sk)
 {
 
-    sk.bones[sk.startingBoneIndex].startsAt = (Vector2){.x = x, .y = y};
+    sk.bones[sk.startingBoneIndex].startsAt = (Vector2){.x = 0, .y = 0};
     sk.bones[sk.startingBoneIndex].rotatedBy = sk.startingBoneAngle;
     int bonesStack[100];
     int placedBones = 0;
@@ -315,17 +336,17 @@ void PlaceSkeleton(float x, float y, Skeleton sk)
     }
 }
 
-void DrawSkeleton(float x, float y, Skeleton skeleton)
+void DrawSkeleton(float x, float y, Skeleton skeleton, float scaleBy)
 {
     for (int i = 0; i < skeleton.bonesCount; i++)
     {
         Bone bone = skeleton.bones[i];
         DrawRectanglePro(
             (Rectangle){
-                .x = bone.startsAt.x,
-                .y = bone.startsAt.y,
+                .x = x + bone.startsAt.x * scaleBy,
+                .y = y + bone.startsAt.y * scaleBy,
                 .height = 2.0f,
-                .width = bone.length},
+                .width = bone.length * scaleBy},
             (Vector2){
                 .x = 0,
                 .y = 0,
@@ -335,17 +356,147 @@ void DrawSkeleton(float x, float y, Skeleton skeleton)
     }
     for (int i = 0; i < skeleton.jointsCount; i++)
     {
-        DrawCircleLinesV(skeleton.joints[i].joinPoint, 10.0f, GRAY);
+        // DrawCircleLines(x + skeleton.joints[i].joinPoint.x * scaleBy, y + skeleton.joints[i].joinPoint.y * scaleBy, 10.0f, GRAY);
     }
 }
 
+bool lockLR = true;
 void DrawSkeletonDebugMenu(float x, float y, Skeleton skeleton)
 {
     for (int i = 0; i < skeleton.bonesCount; i++)
     {
-        GuiSliderBar((Rectangle) {.x = x, .y=y + i*25, 120,20}, BoneNameStr[skeleton.bones[i].name], TextFormat("%.0f", skeleton.bones[i].length), &skeleton.bones[i].length, 1 , 200);
+        int changed = GuiSliderBar((Rectangle){.x = x, .y = y + i * 25, 120, 20}, BoneNameStr[skeleton.bones[i].name], TextFormat("%.0f", skeleton.bones[i].length), &skeleton.bones[i].length, 1, 400);
+        if (changed && lockLR)
+        {
+            BoneName toChange = skeleton.bones[i].name;
+            if (skeleton.bones[i].name == LEFT_UPPER_ARM)
+            {
+                toChange = RIGHT_UPPER_ARM;
+            }
+            if (skeleton.bones[i].name == LEFT_LOWER_ARM)
+            {
+                toChange = RIGHT_LOWER_ARM;
+            }
+            if (skeleton.bones[i].name == LEFT_UPPER_LEG)
+            {
+                toChange = RIGHT_UPPER_LEG;
+            }
+            if (skeleton.bones[i].name == LEFT_LOWER_LEG)
+            {
+                toChange = RIGHT_LOWER_LEG;
+            }
+
+            if (skeleton.bones[i].name == RIGHT_UPPER_ARM)
+            {
+                toChange = LEFT_UPPER_ARM;
+            }
+            if (skeleton.bones[i].name == RIGHT_LOWER_ARM)
+            {
+                toChange = LEFT_LOWER_ARM;
+            }
+            if (skeleton.bones[i].name == RIGHT_UPPER_LEG)
+            {
+                toChange = LEFT_UPPER_LEG;
+            }
+            if (skeleton.bones[i].name == RIGHT_LOWER_LEG)
+            {
+                toChange = LEFT_LOWER_LEG;
+            }
+            if (toChange != skeleton.bones[i].name)
+            {
+                for (int k = 0; k < skeleton.bonesCount; k++)
+                {
+                    if (skeleton.bones[k].name == toChange)
+                    {
+                        skeleton.bones[k].length = skeleton.bones[i].length;
+                    }
+                }
+            }
+        }
     }
-    
+    GuiCheckBox((Rectangle){.x = x, .y = y + skeleton.bonesCount * 25, 20, 20}, "Lock L&R", &lockLR);
+}
+
+void DrawSkin(float x, float y, Skeleton skeleton, float scaleBy)
+{
+    Bone shoulder, lowerSpine, hips;
+    for (int i = 0; i < skeleton.bonesCount; i++)
+    {
+        Bone bone = skeleton.bones[i];
+        if (bone.name == SKULL)
+        {
+            DrawCircle(
+                x + bone.startsAt.x * scaleBy + bone.length * scaleBy * 0.5 * cos(bone.rotatedBy),
+                y + bone.startsAt.y * scaleBy + bone.length * scaleBy * 0.5 * sin(bone.rotatedBy),
+                bone.length * scaleBy * 0.5,
+                RED);
+        }
+        else
+        {
+            if (
+                bone.name == LEFT_UPPER_ARM ||
+                bone.name == LEFT_LOWER_ARM ||
+                bone.name == LEFT_UPPER_LEG ||
+                bone.name == LEFT_LOWER_LEG ||
+                bone.name == RIGHT_UPPER_ARM ||
+                bone.name == RIGHT_LOWER_ARM ||
+                bone.name == RIGHT_UPPER_LEG ||
+                bone.name == RIGHT_LOWER_LEG ||
+                bone.name == NECK)
+            {
+                DrawLineEx(
+                    (Vector2){
+                        .x = x + (bone.startsAt.x ) * scaleBy,
+                        .y = y + (bone.startsAt.y ) * scaleBy,
+                    },
+                    (Vector2){
+                        .x = x + bone.startsAt.x * scaleBy + (bone.length) * scaleBy * cos(bone.rotatedBy),
+                        .y = y + bone.startsAt.y * scaleBy + (bone.length) * scaleBy * sin(bone.rotatedBy),
+                    },
+                    40 * scaleBy,
+                    RED);
+            }
+            if (bone.name == SHOULDER)
+            {
+                shoulder = bone;
+            }
+            if (bone.name == LOWER_SPINE)
+            {
+                lowerSpine = bone;
+            }
+            if (bone.name == HIPS)
+            {
+                hips = bone;
+            }
+        }
+    }
+    DrawTriangle(
+        (Vector2){
+            x + lowerSpine.startsAt.x * scaleBy,
+            y + lowerSpine.startsAt.y * scaleBy,
+        },
+        (Vector2){
+            .x = x + shoulder.startsAt.x * scaleBy + shoulder.length * cos(shoulder.rotatedBy) * scaleBy,
+            .y = y + shoulder.startsAt.y * scaleBy + shoulder.length * sin(shoulder.rotatedBy) * scaleBy},
+        (Vector2){
+            x + shoulder.startsAt.x * scaleBy,
+            y + shoulder.startsAt.y * scaleBy,
+        },
+        RED);
+    DrawTriangle(
+        (Vector2){
+            x + lowerSpine.startsAt.x * scaleBy,
+            y + lowerSpine.startsAt.y * scaleBy,
+        },
+        (Vector2){
+            x + hips.startsAt.x * scaleBy,
+            y + hips.startsAt.y * scaleBy,
+        },
+        (Vector2){
+            .x = x + hips.startsAt.x * scaleBy + hips.length * cos(hips.rotatedBy) * scaleBy,
+            .y = y + hips.startsAt.y * scaleBy + hips.length * sin(hips.rotatedBy) * scaleBy},
+
+        RED);
 }
 int main(void)
 {
@@ -368,7 +519,7 @@ int main(void)
 
     int offX = (screenWidth - squareSize) / 2;
     int offY = (screenHeight - squareSize) / 2;
-    
+
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
@@ -383,19 +534,17 @@ int main(void)
 
         ClearBackground(RAYWHITE);
 
-        
-
         for (int i = 0; i <= squareSize; i += squareUnit)
         {
             DrawLineEx((Vector2){offX, offY + i}, (Vector2){offX + squareSize, offY + i}, 1.0f + (i / squareUnit % 2 == 0 ? 1.5f : 0), LIGHTGRAY);
             DrawLineEx((Vector2){offX + i, offY}, (Vector2){offX + i, offY + squareSize}, 1.0f + (i / squareUnit % 2 == 0 ? 1.5f : 0), LIGHTGRAY);
         }
-        
-        PlaceSkeleton(squareCenter.x, offY, skeleton);
-        DrawSkeleton(squareCenter.x, offY, skeleton);
+
+        PlaceSkeleton(skeleton);
+        DrawSkeleton(squareCenter.x, offY, skeleton, 0.4f);
+        DrawSkin(squareCenter.x, offY, skeleton, 0.4f);
         DrawSkeletonDebugMenu(squareCenter.x + squareUnit * 12, offY, skeleton);
-        
-        
+
         EndDrawing();
         //----------------------------------------------------------------------------------
     }
