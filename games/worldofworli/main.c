@@ -67,6 +67,7 @@ typedef struct Joint
     float boneAJoinAt, boneBJoinAt;
     JoinAngleType joinAngleType;
     float joinAngle;
+    Vector2 joinPoint;
 } Joint;
 
 typedef struct Skeleton
@@ -81,15 +82,6 @@ typedef struct Skeleton
     float startingBoneAngle;
 } Skeleton;
 
-/*
-head            2
-neck            0.6
-upperSpine      2.5
-LowerSpine      2.5
-UpperLeg        1.2
-LowerLeg        1.2
-
-*/
 
 Skeleton generatePersonSkeleton()
 {
@@ -102,31 +94,31 @@ Skeleton generatePersonSkeleton()
     sk.bones = RL_MALLOC(sk.bonesCount * sizeof(Bone));
 
     int index = 0;
-    sk.bones[index] = (Bone){.name = SKULL, .length = 60.0f};
+    sk.bones[index] = (Bone){.name = SKULL, .length = 70.0f};
     index++;
-    sk.bones[index] = (Bone){.name = NECK, .length = 20.0f};
+    sk.bones[index] = (Bone){.name = NECK, .length = 30.0f};
     index++;
-    sk.bones[index] = (Bone){.name = SHOULDER, .length = 60.0f};
+    sk.bones[index] = (Bone){.name = SHOULDER, .length = 100.0f};
     index++;
-    sk.bones[index] = (Bone){.name = LEFT_UPPER_ARM, .length = 40.0f};
+    sk.bones[index] = (Bone){.name = LEFT_UPPER_ARM, .length = 70.0f};
     index++;
-    sk.bones[index] = (Bone){.name = LEFT_LOWER_ARM, .length = 40.0f};
+    sk.bones[index] = (Bone){.name = LEFT_LOWER_ARM, .length = 80.0f};
     index++;
-    sk.bones[index] = (Bone){.name = RIGHT_UPPER_ARM, .length = 40.0f};
+    sk.bones[index] = (Bone){.name = RIGHT_UPPER_ARM, .length = 70.0f};
     index++;
-    sk.bones[index] = (Bone){.name = RIGHT_LOWER_ARM, .length = 40.0f};
+    sk.bones[index] = (Bone){.name = RIGHT_LOWER_ARM, .length = 80.0f};
     index++;
-    sk.bones[index] = (Bone){.name = SPINE, .length = 120.0f};
+    sk.bones[index] = (Bone){.name = SPINE, .length = 130.0f};
     index++;
-    sk.bones[index] = (Bone){.name = HIPS, .length = 40.0f};
+    sk.bones[index] = (Bone){.name = HIPS, .length = 45.0f};
     index++;
-    sk.bones[index] = (Bone){.name = LEFT_UPPER_LEG, .length = 40.0f};
+    sk.bones[index] = (Bone){.name = LEFT_UPPER_LEG, .length = 70.0f};
     index++;
-    sk.bones[index] = (Bone){.name = LEFT_LOWER_LEG, .length = 40.0f};
+    sk.bones[index] = (Bone){.name = LEFT_LOWER_LEG, .length = 100.0f};
     index++;
-    sk.bones[index] = (Bone){.name = RIGHT_UPPER_LEG, .length = 40.0f};
+    sk.bones[index] = (Bone){.name = RIGHT_UPPER_LEG, .length = 70.0f};
     index++;
-    sk.bones[index] = (Bone){.name = RIGHT_LOWER_LEG, .length = 40.0f};
+    sk.bones[index] = (Bone){.name = RIGHT_LOWER_LEG, .length = 100.0f};
     index++;
 
     sk.jointsCount = 12;
@@ -139,7 +131,7 @@ Skeleton generatePersonSkeleton()
         .boneAJoinAt = 1,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
-        .joinAngle = 0};
+        .joinAngle = 0.1f};
     index++;
 
     sk.joints[index] = (Joint){
@@ -147,8 +139,8 @@ Skeleton generatePersonSkeleton()
         .boneB = SHOULDER,
         .boneAJoinAt = 1,
         .boneBJoinAt = 0.5f,
-        .joinAngleType = RELATIVE,
-        .joinAngle = -PI / 2,
+        .joinAngleType = ABSOLUTE,
+        .joinAngle = 0,
     };
     index++;
 
@@ -168,7 +160,7 @@ Skeleton generatePersonSkeleton()
         .boneAJoinAt = 0,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
-        .joinAngle = PI / 2 + 0.2f,
+        .joinAngle = PI / 2 + PI * 0.1,
     };
     index++;
     sk.joints[index] = (Joint){
@@ -177,7 +169,7 @@ Skeleton generatePersonSkeleton()
         .boneAJoinAt = 1,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
-        .joinAngle = -0.2f,
+        .joinAngle = PI * 0.5,
     };
     index++;
 
@@ -187,7 +179,7 @@ Skeleton generatePersonSkeleton()
         .boneAJoinAt = 1,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
-        .joinAngle = PI / 2,
+        .joinAngle = PI / 2 - PI * 0.1,
     };
     index++;
     sk.joints[index] = (Joint){
@@ -196,7 +188,7 @@ Skeleton generatePersonSkeleton()
         .boneAJoinAt = 1,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
-        .joinAngle = 0,
+        .joinAngle = -PI * 0.5,
     };
     index++;
 
@@ -216,7 +208,7 @@ Skeleton generatePersonSkeleton()
         .boneAJoinAt = 0,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
-        .joinAngle = PI / 2,
+        .joinAngle = PI / 2 + PI * 0.06f,
     };
     index++;
     sk.joints[index] = (Joint){
@@ -225,7 +217,7 @@ Skeleton generatePersonSkeleton()
         .boneAJoinAt = 1,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
-        .joinAngle = 0,
+        .joinAngle = -PI * 0.1f,
     };
     index++;
 
@@ -235,7 +227,7 @@ Skeleton generatePersonSkeleton()
         .boneAJoinAt = 1,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
-        .joinAngle = PI / 2,
+        .joinAngle = PI / 2 - PI * 0.06f,
     };
     index++;
     sk.joints[index] = (Joint){
@@ -244,58 +236,62 @@ Skeleton generatePersonSkeleton()
         .boneAJoinAt = 1,
         .boneBJoinAt = 0,
         .joinAngleType = RELATIVE,
-        .joinAngle = 0,
+        .joinAngle = PI * 0.1f,
     };
     index++;
 
     return sk;
 }
 
-void CalculateDrawOffsets(float x, float y, Skeleton skeleton)
+void PlaceSkeleton(float x, float y, Skeleton sk)
 {
 
-    skeleton.bones[skeleton.startingBoneIndex].startsAt = (Vector2){.x = x, .y = y};
-    skeleton.bones[skeleton.startingBoneIndex].rotatedBy = skeleton.startingBoneAngle;
-    Bone bonesToWalk[100];
-    int centeredBonesLength = 0;
-    bonesToWalk[centeredBonesLength] = skeleton.bones[skeleton.startingBoneIndex];
-    centeredBonesLength++;
-    while (centeredBonesLength != 0)
+    sk.bones[sk.startingBoneIndex].startsAt = (Vector2){.x = x, .y = y};
+    sk.bones[sk.startingBoneIndex].rotatedBy = sk.startingBoneAngle;
+    int bonesStack[100];
+    int placedBones = 0;
+    
+    //push to stack
+    bonesStack[placedBones] = sk.startingBoneIndex;
+    placedBones++;
+    
+    while (placedBones != 0)
     {
-        Bone *workingBone = &bonesToWalk[centeredBonesLength - 1];
-        centeredBonesLength--;
-
-        TraceLog(LOG_INFO, "Walking bone of type %d", workingBone->name);
-        for (int i = 0; i < skeleton.jointsCount; i++)
+        //pop from stack
+        Bone fromBone = sk.bones[bonesStack[placedBones - 1]];
+        placedBones--;
+        
+        for (int i = 0; i < sk.jointsCount; i++)
         {
-            Joint joint = skeleton.joints[i];
-            if (joint.boneA == workingBone->name)
+            if (sk.joints[i].boneA == fromBone.name)
             {
-                Bone *boneB = NULL;
-                for (int b = 0; b < skeleton.bonesCount; b++)
+                int toBoneIndex = -1;
+                for (int b = 0; b < sk.bonesCount; b++)
                 {
-                    if (skeleton.bones[b].name == joint.boneB)
+                    if (sk.bones[b].name == sk.joints[i].boneB)
                     {
-                        boneB = &skeleton.bones[b];
+                        toBoneIndex = b;
                     }
                 }
                 
-                float angle = joint.joinAngle;
-                if (joint.joinAngleType == RELATIVE)
+                float angle = sk.joints[i].joinAngle;
+                if (sk.joints[i].joinAngleType == RELATIVE)
                 {
-                    angle += workingBone->rotatedBy;
+                    angle += fromBone.rotatedBy;
                 }
-                Vector2 jointPoint = (Vector2){
-                    .x = workingBone->startsAt.x + joint.boneAJoinAt * workingBone->length * cosf(workingBone->rotatedBy),
-                    .y = workingBone->startsAt.y + joint.boneAJoinAt * workingBone->length * sinf(workingBone->rotatedBy),
+                sk.joints[i].joinPoint = (Vector2){
+                    .x = fromBone.startsAt.x + sk.joints[i].boneAJoinAt * fromBone.length * cosf(fromBone.rotatedBy),
+                    .y = fromBone.startsAt.y + sk.joints[i].boneAJoinAt * fromBone.length * sinf(fromBone.rotatedBy),
                 };
-                boneB->startsAt = (Vector2){
-                    .x = jointPoint.x - joint.boneBJoinAt * boneB->length * cosf(angle),
-                    .y = jointPoint.y - joint.boneBJoinAt * boneB->length * sinf(angle),
+                sk.bones[toBoneIndex].startsAt = (Vector2){
+                    .x = sk.joints[i].joinPoint.x - sk.joints[i].boneBJoinAt * sk.bones[toBoneIndex].length * cosf(angle),
+                    .y = sk.joints[i].joinPoint.y - sk.joints[i].boneBJoinAt * sk.bones[toBoneIndex].length * sinf(angle),
                 };
-                boneB->rotatedBy = angle;
-                bonesToWalk[centeredBonesLength] = *boneB;
-                centeredBonesLength++;
+                sk.bones[toBoneIndex].rotatedBy = angle;
+                
+                //push to stack
+                bonesStack[placedBones] = toBoneIndex;
+                placedBones++;
             }
         }
     }
@@ -320,11 +316,13 @@ void DrawSkeleton(float x, float y, Skeleton skeleton)
             RED);
         
     }
+    for (int i = 0; i < skeleton.jointsCount; i++)
+    {
+        DrawCircleLinesV(skeleton.joints[i].joinPoint, 10.0f, GRAY);
+    }
+    
 }
 
-//------------------------------------------------------------------------------------
-// Program main entry point
-//------------------------------------------------------------------------------------
 int main(void)
 {
     setbuf(stdout, NULL);
@@ -347,7 +345,7 @@ int main(void)
     int offX = (screenWidth - squareSize) / 2;
     int offY = (screenHeight - squareSize) / 2;
 
-    CalculateDrawOffsets(squareCenter.x, offY, skeleton);
+    PlaceSkeleton(squareCenter.x, offY, skeleton);
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
