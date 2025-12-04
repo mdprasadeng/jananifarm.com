@@ -27,6 +27,7 @@
 #include "raylib.h"
 #define RAYGUI_IMPLEMENTATION
 #include "./raygui.h"
+#include "./rayguitheme.h"
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -359,7 +360,7 @@ void DrawSkeleton(float x, float y, Skeleton skeleton, float scaleBy)
                 .y = 0,
             },
             bone.rotatedBy * RAD2DEG,
-            RED);
+            WHITE);
     }
     for (int i = 0; i < skeleton.jointsCount; i++)
     {
@@ -437,7 +438,7 @@ void DrawSkin(float x, float y, Skeleton skeleton, float scaleBy)
                 x + bone.startsAt.x * scaleBy + bone.length * scaleBy * 0.5 * cos(bone.rotatedBy),
                 y + bone.startsAt.y * scaleBy + bone.length * scaleBy * 0.5 * sin(bone.rotatedBy),
                 bone.length * scaleBy * 0.5,
-                RED);
+                WHITE);
         }
         else
         {
@@ -462,7 +463,7 @@ void DrawSkin(float x, float y, Skeleton skeleton, float scaleBy)
                         .y = y + bone.startsAt.y * scaleBy + (bone.length) * scaleBy * sin(bone.rotatedBy),
                     },
                     lineThickness,
-                    RED);
+                    WHITE);
             }
             if (bone.name == SHOULDER)
             {
@@ -490,7 +491,7 @@ void DrawSkin(float x, float y, Skeleton skeleton, float scaleBy)
             x + shoulder.startsAt.x * scaleBy,
             y + shoulder.startsAt.y * scaleBy,
         },
-        (Color){230, 41, 55, 55});
+        WHITE);
     DrawTriangle(
         (Vector2){
             x + lowerSpine.startsAt.x * scaleBy,
@@ -504,7 +505,7 @@ void DrawSkin(float x, float y, Skeleton skeleton, float scaleBy)
             .x = x + hips.startsAt.x * scaleBy + hips.length * cos(hips.rotatedBy) * scaleBy,
             .y = y + hips.startsAt.y * scaleBy + hips.length * sin(hips.rotatedBy) * scaleBy},
 
-        (Color){230, 41, 55, 55});
+        WHITE);
 }
 int main(void)
 {
@@ -528,18 +529,19 @@ int main(void)
     int offX = (screenWidth - squareSize) / 2;
     int offY = (screenHeight - squareSize) / 2;
 
+    GuiLoadStyleDark();
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
         BeginDrawing();
-        ClearBackground(RAYWHITE);
+        ClearBackground((Color){160, 11, 8, 255});
 
         // Draw Grid Lines
         {
             for (int i = 0; i <= squareSize; i += squareUnit)
             {
-                DrawLineEx((Vector2){offX, offY + i}, (Vector2){offX + squareSize, offY + i}, 1.0f + (i / squareUnit % 2 == 0 ? 1.5f : 0), LIGHTGRAY);
-                DrawLineEx((Vector2){offX + i, offY}, (Vector2){offX + i, offY + squareSize}, 1.0f + (i / squareUnit % 2 == 0 ? 1.5f : 0), LIGHTGRAY);
+                DrawLineEx((Vector2){offX, offY + i}, (Vector2){offX + squareSize, offY + i}, 1.0f + (i / squareUnit % 2 == 0 ? 1.5f : 0), (Color){ 255, 255, 255, 105 });
+                DrawLineEx((Vector2){offX + i, offY}, (Vector2){offX + i, offY + squareSize}, 1.0f + (i / squareUnit % 2 == 0 ? 1.5f : 0), (Color){ 255, 255, 255, 105 });
             }
         }
 
@@ -550,6 +552,7 @@ int main(void)
         PlaceSkeleton(skeleton);
         DrawSkeleton(squareCenter.x, offY, skeleton, 0.4f);
         DrawSkin(squareCenter.x, offY, skeleton, 0.4f);
+        
         DrawSkeletonDebugMenu(squareCenter.x + squareUnit * 12, offY, skeleton);
 
         EndDrawing();
