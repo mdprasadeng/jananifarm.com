@@ -359,7 +359,7 @@ void DrawSkeleton(float x, float y, Skeleton skeleton, float scaleBy)
                 .y = 0,
             },
             bone.rotatedBy * RAD2DEG,
-            WHITE);
+            RED);
     }
     for (int i = 0; i < skeleton.jointsCount; i++)
     {
@@ -437,7 +437,7 @@ void DrawSkin(float x, float y, Skeleton skeleton, float scaleBy)
                 x + bone.startsAt.x * scaleBy + bone.length * scaleBy * 0.5 * cos(bone.rotatedBy),
                 y + bone.startsAt.y * scaleBy + bone.length * scaleBy * 0.5 * sin(bone.rotatedBy),
                 bone.length * scaleBy * 0.5,
-                WHITE);
+                RED);
         }
         else
         {
@@ -462,7 +462,7 @@ void DrawSkin(float x, float y, Skeleton skeleton, float scaleBy)
                         .y = y + bone.startsAt.y * scaleBy + (bone.length) * scaleBy * sin(bone.rotatedBy),
                     },
                     lineThickness,
-                    WHITE);
+                    RED);
             }
             if (bone.name == SHOULDER)
             {
@@ -532,7 +532,7 @@ int main(void)
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
         BeginDrawing();
-        ClearBackground(MAROON);
+        ClearBackground(RAYWHITE);
 
         // Draw Grid Lines
         {
