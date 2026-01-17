@@ -1,37 +1,32 @@
 #include "raylib.h"
 
-#define RAYGUI_IMPLEMENTATION
-#include "raygui.h"
 
-int main()
+
+#include "rlImGui.h"	// include the API header
+#include "dcimgui.h"
+
+int main(void)
 {
-    InitWindow(512, 512, "raygui - controls test suite");
-    SetTargetFPS(60);
-
-    bool showMessageBox = false;
-
+    InitWindow(800, 450, "raylib [core] example - basic window");
+    rlImGuiSetup(true); 	// sets up ImGui with ether a dark or light default theme
+    bool showDemo = false;
     while (!WindowShouldClose())
     {
-        // Draw
-        //----------------------------------------------------------------------------------
         BeginDrawing();
-        ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
+            rlImGuiBegin();			// starts the ImGui content mode. Make all ImGui calls after this
+            
+            ImGui_ShowDemoWindow(&showDemo);
 
-        if (GuiButton((Rectangle){24, 24, 120, 30}, "#191#Show Message"))
-            showMessageBox = true;
+            ClearBackground(RAYWHITE);
+            DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
 
-        if (showMessageBox)
-        {
-            int result = GuiMessageBox((Rectangle){85, 70, 250, 100},
-                                       "#191#Message Box", "Hi! This is a message!", "Nice;Cool");
-
-            if (result >= 0)
-                showMessageBox = false;
-        }
+            rlImGuiEnd();			// ends the ImGui content mode. Make all ImGui calls before this
 
         EndDrawing();
     }
 
+    rlImGuiShutdown();		// cleans up ImGui
     CloseWindow();
+
     return 0;
 }
